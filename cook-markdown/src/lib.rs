@@ -1,3 +1,6 @@
+extern crate fraction;
+
+use fraction::Fraction;
 use std::ops::Not;
 use cook_with_rust_parser::*;
 
@@ -19,19 +22,19 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
                 Some(d) => {
                     match d {
                         Amount::Multi(dd) => {
-                            format!("servings * {}", dd)
+                            format!("servings * {}", Fraction::from(*dd))
                         }
                         Amount::Servings(dd) => {
                             let mut servings = String::new();
                             dd.iter().for_each(|a| {
-                                servings.push_str(&a.to_string());
+                                servings.push_str(&Fraction::from(*a).to_string());
                                 servings.push('|');
                             });
                             servings.pop();
                             servings
                         }
                         Amount::Single(dd) => {
-                            dd.to_string()
+                            Fraction::from(*dd).to_string()
                         }
                     }
                 },
@@ -69,7 +72,8 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
             };
             let ingredient_amount = match &insert_ingredient.amount_in_step {
                 Amount::Multi(d) => {
-                    format!(" *{}", d)
+                    //format!(" *{}", d)
+                    Fraction::from(*d).to_string()
                 }
                 Amount::Servings(dd) => {
                     let mut servings = String::new();
@@ -83,13 +87,13 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
                     servings
                 }
                 Amount::Single(d) => {
-                    let mut res = String::from(' ');
-                    res.push_str(d.to_string().as_str());
+                    let mut res = String::new();
+                    res.push_str(Fraction::from(*d).to_string().as_str());
                     // res.push(' ');
                     res
                 }
             };
-            let insert_string = format!("__{}{}{}__", ingredient_name, ingredient_amount, ingredient_unit);
+            let insert_string = format!("__{} ({}{})__", ingredient_name, ingredient_amount, ingredient_unit);
             result_string += &insert_string;
         } else if char == '#' {
             result_string.push_str("_");
