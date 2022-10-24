@@ -22,19 +22,19 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
                 Some(d) => {
                     match d {
                         Amount::Multi(dd) => {
-                            format!("servings * {}", Fraction::from(*dd))
+                            format!("servings * {}", format_amount(dd))
                         }
                         Amount::Servings(dd) => {
                             let mut servings = String::new();
                             dd.iter().for_each(|a| {
-                                servings.push_str(&Fraction::from(*a).to_string());
+                                servings.push_str(&format_amount(a));
                                 servings.push('|');
                             });
                             servings.pop();
                             servings
                         }
                         Amount::Single(dd) => {
-                            Fraction::from(*dd).to_string()
+                            format_amount(dd)
                         }
                     }
                 },
@@ -73,7 +73,7 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
             let ingredient_amount = match &insert_ingredient.amount_in_step {
                 Amount::Multi(d) => {
                     //format!(" *{}", d)
-                    Fraction::from(*d).to_string()
+                    format_amount(d)
                 }
                 Amount::Servings(dd) => {
                     let mut servings = String::new();
@@ -88,7 +88,7 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
                 }
                 Amount::Single(d) => {
                     let mut res = String::new();
-                    res.push_str(Fraction::from(*d).to_string().as_str());
+                    res.push_str(format_amount(d).as_str());
                     // res.push(' ');
                     res
                 }
@@ -112,6 +112,18 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
     });
 
     result_string
+}
+
+fn format_amount(amount: &f64) -> String {
+    if *amount == 1.0/3.0 {
+        return "1/3".to_string();
+    } else if *amount == 2.0/3.0 {
+        return "2/3".to_string();
+    } else if *amount > 1.0 && amount.fract() != 0.0 {
+        return format!("{} {}", amount.trunc(), Fraction::from(amount.fract()));
+    } else {
+        return Fraction::from(*amount).to_string();
+    }
 }
 
 #[cfg(test)]
