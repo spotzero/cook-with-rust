@@ -115,14 +115,28 @@ pub fn recipe_to_markdown(recipe: &Recipe) -> String {
 }
 
 fn format_amount(amount: &f64) -> String {
-    if *amount == 1.0/3.0 {
-        return "1/3".to_string();
-    } else if *amount == 2.0/3.0 {
-        return "2/3".to_string();
-    } else if *amount > 1.0 && amount.fract() != 0.0 {
-        return format!("{} {}", amount.trunc(), Fraction::from(amount.fract()));
+    let whole = amount.trunc();
+    let fractional = amount.fract();
+    if fractional == 0.0 {
+        return whole.to_string();
+    }
+
+    let fraction = if fractional == 1.0/6.0 {
+            "1/6".to_string()
+        } else if fractional == 1.0/3.0 {
+            "1/3".to_string()
+        } else if fractional == 2.0/3.0 {
+            "2/3".to_string()
+        } else if fractional == 5.0/6.0 || fractional == 1.0/3.0 + 1.0/2.0 {
+            "5/6".to_string()
+        } else {
+            Fraction::from(fractional).to_string()
+        };
+
+    if whole > 0.0 {
+        return format!("{} {}", whole, fraction);
     } else {
-        return Fraction::from(*amount).to_string();
+        return fraction;
     }
 }
 
