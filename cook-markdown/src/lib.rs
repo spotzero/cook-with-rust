@@ -121,13 +121,13 @@ fn format_amount(amount: &f64) -> String {
         return whole.to_string();
     }
 
-    let fraction = if fractional == 1.0/6.0 {
+    let fraction = if is_basically_the_same(&fractional, 1.0/6.0) {
             "1/6".to_string()
-        } else if fractional == 1.0/3.0 {
+        } else if is_basically_the_same(&fractional, 1.0/3.0) {
             "1/3".to_string()
-        } else if fractional == 2.0/3.0 {
+        } else if is_basically_the_same( &fractional, 2.0/3.0) {
             "2/3".to_string()
-        } else if fractional == 5.0/6.0 || fractional == 1.0/3.0 + 1.0/2.0 {
+        } else if is_basically_the_same( &fractional, 5.0/6.0) {
             "5/6".to_string()
         } else {
             Fraction::from(fractional).to_string()
@@ -138,6 +138,10 @@ fn format_amount(amount: &f64) -> String {
     } else {
         return fraction;
     }
+}
+
+fn is_basically_the_same(a: &f64, b: f64) -> bool {
+    return (a - b).abs() < 0.0001;
 }
 
 #[cfg(test)]
